@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <!-- <t t-name="account_consolidation.ConsolidationReportFilters" t-inherit="account_reports.AccountReportFiltersCustomizable">
+    
+    </t> -->
+
+
+
+
+
+    <!-- <t t-name="l10n_ve_account_reports_dual.search_template_custom"
+        t-inherit="account_reports.AccountReportFiltersCustomizable">
+        <xpath expr="//t[@t-if='hasExtraOptionsFilter']" position="after"> 
+            <div class="acc_rep_filter_tax_unit">
+                <t t-call="l10n_ar_reports.L10nArReportsFilterTaxType"/>
+            </div>
+        </xpath>
+    </t> -->
+
+
+
+<!--        There is no "account_reports.search_template template" to inherit if we want this functionality we need to do customisation-->
+
+        <t t-name="l10n_ve_account_reports_dual.search_template_custom" t-inherit="account_reports.AccountReportFiltersCustomizable">
+            <xpath expr="." position="inside">
+                <button type="button" class="o_dropdown_toggler_btn btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                    <span class="fa fa-money"></span>
+                    Moneda: 
+                    <span t-foreach="controller.options['currencies']" t-as="currency" t-if="currency['id'] == controller.options['selected_currency']" t-key="currency['id']" t-esc="currency['name']"/>
+                </button>
+                <div class="dropdown-menu o_filter_menu" role="menu">
+                    <t t-foreach="controller.options['currencies']" t-as="currency" t-key="currency['id']">
+                        <DropdownItem class="{ 'selected': currency.id === controller.options['selected_currency'] || currency.selected }" 
+                            onSelected="() => { this.handleCurrencySelection(currency) }" >
+                            <t t-esc="currency.name" />
+                        </DropdownItem>
+                    </t>
+                </div>
+            </xpath>
+        </t>
+
+        
+</templates>
