@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="account_move_invoice_report" model="ir.actions.report">
+            <field name="name">Imprimir Factura Fiscal</field>
+            <field name="model">account.move</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">omegasoft_print_fiscal_invoice.report_tax_invoice</field>
+            <field name="print_report_name">(object.name)</field>
+            <field name="binding_model_id" ref="account.model_account_move" />
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="report_tax_invoice">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="o">
+                    <t t-if="not o" t-set="o" t-value="doc" />
+
+                    <t t-if="not company">
+                        <!-- Multicompany -->
+                        <t t-if="company_id">
+                            <t t-set="company" t-value="company_id" />
+                        </t>
+                        <t t-elif="o and 'company_id' in o and o.company_id.sudo()">
+                            <t t-set="company" t-value="o.company_id.sudo()" />
+                        </t>
+                        <t t-else="else">
+                            <t t-set="company" t-value="res_company" />
+                        </t>
+                    </t>
+
+                    <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style">
+                        <div>
+                            <div class="container" style="font-size: small;">
+                                <div
+                                    style="position: absolute; top: 4.23cm; left: 10.02cm; right: 7.04cm;">
+                                    <span style="padding-right: 0.6cm;">
+                                        <t t-esc="o.invoice_date.day" />
+                                    </span>
+                                    <span style="padding-right: 0.6cm;">
+                                        <t t-esc="o.invoice_date.month" />
+                                    </span>
+                                    <span style="padding-right: 0.6cm;">
+                                        <t t-esc="o.invoice_date.year" />
+                                    </span>
+                                </div>
+                                <div style="position: absolute; top: 4.85cm; left: 3.33cm; right: 3.20cm;">
+                                    <span>
+                                        <t t-esc="o.partner_id.name" />
+                                    </span>
+                                </div>
+                                <div style="position: absolute; top: 5.55cm; left: 3.33cm; right: 3.20cm;">
+                                    <span>
+                                        <span t-esc="o.partner_id.street" />
+                                        <span t-if="o.partner_id.street2"
+                                            t-esc="', ' + o.partner_id.street2" />
+                                        <span t-if="o.partner_id.city"
+                                            t-esc="', ' + o.partner_id.city" />
+                                        <span t-if="o.partner_id.state_id"
+                                            t-esc="', ' + o.partner_id.state_id.name" />
+                                        <span t-if="o.partner_id.zip"
+                                            t-esc="', ' + o.partner_id.zip" />
+                                    </span>
+                                </div>
+                                <div style="position: absolute; top: 7.51cm; left: 1.22cm; right: 17.25cm;">
+                                    <span>
+                                        <t t-if="o.partner_id.phone">
+                                            <span t-esc="o.partner_id.phone" />
+                                        </t>
+                                        <t t-elif="o.partner_id.mobile">
+                                            <span t-esc="o.partner_id.mobile" />
+                                        </t>
+                                    </span>
+                                </div>
+                                <div style="position: absolute; top: 7.51cm; left: 5.95cm; right: 13.41cm;">
+                                    <span>
+                                        <t t-esc="o.partner_id.vat" />
+                                    </span>
+                                </div>
+                                <div style="position: absolute; top: 7.51cm; left: 9.09cm; right: 10.4cm;">
+                                    <span>
+                                        <t t-esc="o.invoice_origin" />
+                                    </span>
+                                </div>
+                                <div style="position: absolute; top: 7.51cm; left: 12.83cm; right: 6.45cm;">
+                                    <t t-set="order" t-value="o.get_date_order()" />
+                                    <span>
+                                        <t t-esc="order['date_order']" />
+                                    </span>
+                                </div>
+                                <div>
+                                    <t t-set="today" t-value="o.get_date_today()" />
+                                    <t t-if="o.invoice_date == o.invoice_date_due">
+                                        <div style="position: absolute; top: 7.51cm; left: 15.20cm;">
+                                            <span>X</span>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-set="date_res" t-value="o.invoice_date_due - today" />
+                                        <div style="position: absolute; top: 7.51cm; left: 16.60cm;">
+                                            <span>X</span>
+                                        </div>
+                                        <div style="position: absolute; top: 7.51cm; left: 18.40cm;">
+                                            <span><t t-esc="date_res.days"/></span>
+                                        </div>
+                                    </t>
+                                </div>
+                                <div style="position: absolute; top: 8.20cm; left: 1.09cm; right: 1.67cm;">
+                                    <table class="table table-borderless">
+                                        <tbody>
+                                            <t t-set="lines" t-value="o.invoice_line_ids.sorted(key=lambda l: (-l.sequence, l.date, l.move_name, -l.id), reverse=True)" />
+                                            <t t-foreach="lines" t-as="line">
+                                                <tr class="tc_hover">
+                                                    <td style="width: 66px;">
+                                                        <span t-field="line.quantity" />
+                                                    </td>
+                                                    <td style="width: 346px;">
+                                                        <span t-field="line.product_id.name" />
+                                                    </td>
+                                                    <td style="width: 70px;">
+                                                        <span t-field="line.product_id.default_code"></span>
+                                                    </td>
+                                                    <td style="width: 25px;">
+                                                        <t
+                                                            t-if="line.tax_ids.fiscal_tax_type == 'exempt'">
+                                                            <span>X</span>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <span></span>
+                                                        </t>
+                                                    </td>
+                                                    <td style="width: 97px;">
+                                                        <span t-field="line.price_unit"></span>
+                                                    </td>
+                                                    <td style="width: 138px;">
+                                                        <span t-field="line.price_subtotal"></span>
+                                                    </td>
+                                                </tr>
+                                                <br />
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div style="position: absolute; right: 1.14cm; top:23cm; width: 500px;">
+                                    <div class="row">
+                                        <div class="col-6">
+    
+                                        </div>
+                                        <div class="col-6">
+                                            <t t-set="line_total"
+                                                t-value="o.get_account_move_line_totals()" />
+                                            <div class="row">
+                                                <div class="col-6">
+                                                </div>
+                                                <div class="col-6" style="padding-bottom: 0.85cm">
+                                                    <span class="text-dark pull-right"
+                                                        t-esc="line_total['total_exent']"></span>Bs </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                </div>
+                                                <div class="col-6" style="padding-bottom: 0.85cm">
+                                                    <span class="text-dark pull-right"
+                                                        t-esc="line_total['total_discount']"></span> Bs </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                </div>
+                                                <div class="col-6" style="padding-bottom: 0.85cm">
+                                                    <span class="text-dark pull-right"
+                                                        t-esc="line_total['total_tax']"></span>Bs </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                </div>
+                                                <div class="col-6" style="padding-bottom: 0.85cm">
+                                                    <span class="text-dark pull-right"
+                                                        t-esc="line_total['total_iva']"></span>Bs </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-6">
+                                                </div>
+                                                <div class="col-6" style="padding-bottom: 0.85cm">
+                                                    <span
+                                                        t-esc="o.amount_total_signed"></span> Bs </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

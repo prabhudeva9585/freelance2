@@ -1,0 +1,10 @@
+<odoo>
+    <template id="address_custom_label" inherit_id="website_sale.address" name="Custom Address Label">
+        <xpath expr="//label[@for='vat']" position="replace">
+            <label class="col-form-label fw-normal label-optional" for="vat">Documento de Identificación</label>
+        </xpath>
+        <xpath expr="//input[@name='vat']" position="attributes">
+            <attribute name="placeholder">Ejemplos: V123456789 / J123456789</attribute>
+        </xpath>
+    </template>
+</odoo>

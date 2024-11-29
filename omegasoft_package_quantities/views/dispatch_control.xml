@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <record id="dispatch_control_view_form_package_quantities" model="ir.ui.view">
+        <field name="name">dispatch.control.view.form</field>
+        <field name="model">dispatch.control</field>
+        <field name="inherit_id" ref="omegasoft_dispatch_control.dispatch_control_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="(//field[@name='picking_ids'])[2]" position="after">
+                <field name="package_quantities"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

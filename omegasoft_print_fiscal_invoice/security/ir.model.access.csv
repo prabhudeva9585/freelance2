@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_omegasoft_print_fiscal_invoice_omegasoft_print_fiscal_invoice,omegasoft_print_fiscal_invoice.omegasoft_print_fiscal_invoice,model_omegasoft_print_fiscal_invoice_omegasoft_print_fiscal_invoice,base.group_user,1,1,1,1
